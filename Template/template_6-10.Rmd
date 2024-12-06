@@ -1,0 +1,203 @@
+---
+title: "Estadística Descriptiva"
+author: "Inserte nombres"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::readthedown:
+    highlight: tango
+    self_contained: true
+    thumbnails: true
+    output: html_document
+---
+
+<style>
+
+#main :not(.leaflet-control) > a {
+  background-image: linear-gradient(180deg, #0099DB, #00A2E8);
+  color: #000000;
+}
+
+#nav-top span.glyphicon {
+    color: #191970;
+    font-size: 28px;
+}
+
+#postamble {
+ border-top:none;
+}
+
+#toc, #sidebar {
+  background-color: #000000;
+}
+
+#toc a:hover {
+  background-color: #6495ED;
+  color: white;
+}
+
+#sidebar h2 {
+  background-color: #191970;
+}
+
+#toc a {
+  color: #FFFFF0;
+}
+
+h1, h2, h3 {
+  color: #0000FF;
+}
+
+img.image-thumb {
+    width: 100%;
+    max-width: 10000px;
+}
+
+</style>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE)
+```
+
+```{r datos, include = FALSE}
+datos <- read.csv("Base_Estadistica_Descriptiva.csv", header = TRUE, sep = ",")
+set.seed(89025074)
+```
+
+```{r librerias, include = FALSE}
+# install.packages("rmdformats")
+# install.packages("ggplot2")
+# install.packages("DT")
+library(ggplot2)
+library(DT)
+```
+
+# Muestra obtenida
+
+```{r}
+muestra_datos <- datos[sample(nrow(datos), size = 100), 1:8]
+datatable(muestra_datos)
+```
+
+# 3. Análisis de Variables Cuantitativas Continuas
+
+## 6. Construye un histograma de la variable Estatura. ¿Qué puedes decir sobre su distribución?
+
+```{r}
+# Se usa la regla de Sturges para calcular la cantidad de clases a graficar
+# posteriormente se calculara el ancho de la clase para tomarlo como argumento
+# en geom_histogram
+numero_clases <- 1 + (3.33 * log10(length(muestra_datos$Estatura)))
+
+estatura_menor <- min(muestra_datos$Estatura)
+estatura_mayor <- max(muestra_datos$Estatura)
+
+ancho_clase <- (estatura_mayor - estatura_menor) / numero_clases
+
+graf_hist <- ggplot(data = muestra_datos, aes(x = Estatura, fill = after_stat(count))) +
+  geom_histogram(binwidth = ancho_clase, color = "black") +
+  labs(title = "Histograma de estatura",
+       x = "Estatura (m)",
+       y = "Frecuencia") +
+  scale_fill_gradient(low = "lightblue", high = "blue") +
+  theme_minimal()
+
+graf_hist
+```
+
+El histograma presenta una distribucion bimodal, lo que indica que las estaturas mas comunes se encuentran cerca de 1.60 y 1.80 metros, pero no entre estos valores. Tambien se puede observar una ligera asimetria a la derecha, lo que deja ver que no es comun poseer una estatura muy elevada.
+
+## 7. Calcula la media y el percentil 90 de la variable HorasDeTrabajo. Interpreta los resultados.
+
+```{r, results = 'asis'}
+media_horas_trabajo <- mean(muestra_datos$HorasDeTrabajo)
+cat("Media de horas de trabajo: ", media_horas_trabajo)
+
+# Recordar que esto es una posicion
+percentil_90 <- round((length(muestra_datos$HorasDeTrabajo) + 1) * 90 / 100)
+cat("Percentil 90 de la variable HorasDeTrabajo: ", percentil_90)
+
+cat("Dato en el percentil 90 (ordenando la informacion de menor a mayor): ", sort(muestra_datos$HorasDeTrabajo)[percentil_90])
+```
+
+Podemos entender que una persona que realizar mas de 53.8 horas de trabajo se encuentra en el 10% de los encuestados, lo que nos dice que realizar un poco mas de 10 horas respecto al promedio ya es algo inusual, es decir, dado que la media es 42.7 horas y el percentil 90 es 53.8 horas, una gran parte de las personas trabaja entre 42.7 y 53.8 horas. No obstante, tener una jornada mas larga corresponde a una minoria
+
+# 4. Comparaciones entre Variables
+
+## 8. Compara las alturas promedio (Estatura) por género (Genero). ¿Cuál es la diferencia más destacada?
+
+```{r}
+# Se filtran los datos segun genero
+promedio_estatura_masculino <- mean(muestra_datos[muestra_datos$Genero == "Masculino", 6])
+promedio_estatura_femenino <- mean(muestra_datos[muestra_datos$Genero == "Femenino", 6])
+
+# Se crea un dataframe para poder realizar un grafico adecuadamente con ggplot
+df_promedio_estatura <- data.frame(
+  Genero = c("Masculino", "Femenino"),
+  Promedio = c(promedio_estatura_masculino, promedio_estatura_femenino))
+
+diag_barra <- ggplot(df_promedio_estatura, aes(x = Genero, y = Promedio)) +
+  geom_bar(stat = "identity", fill = 4) +
+  geom_text(aes(label = round(Promedio, 2)), vjust = -1, colour = "black") +
+  coord_cartesian(ylim = c(1.7, 1.75)) +
+  labs(title = "Promedio de Estatura por Género",
+       x = "Género",
+       y = "Promedio (m)")
+
+diag_barra
+```
+
+La diferencia mas destacada que podemos encontrar es que, en promedio, el genero masculino tiene una estatura mayor al genero femenino
+
+## 9. Analiza si los ingresos promedio (IngresoMensual) varían según el nivel educativo (NivelEducativo).
+
+```{r}
+# Se separan los datos teniendo en cuenta el nivel educativo, esto nos permite
+# acceder a los datos segun el nivel deseado
+nivel_educactivo <- split(muestra_datos, muestra_datos$NivelEducativo)
+
+# Se crea un dataframe para poder realizar un grafico adecuadamente con ggplot
+df_promedio_ingresos <- data.frame(Nivel = c("Primaria", "Secundaria", "Técnico", "Universitario"),
+                                   Promedio = c(
+                                     mean(nivel_educactivo$Primaria$IngresoMensual),
+                                     mean(nivel_educactivo$Secundaria$IngresoMensual),
+                                     mean(nivel_educactivo$Técnico$IngresoMensual),
+                                     mean(nivel_educactivo$Universitario$IngresoMensual)))
+
+diag_barra <- ggplot(df_promedio_ingresos, aes(x = Nivel, y = Promedio)) +
+  geom_bar(stat = "identity", fill = 4) +
+  geom_text(aes(label = round(Promedio, 2)), vjust = -1, colour = "black") +
+  ylim(c(0, 2500)) +
+  labs(title = "Promedio de Ingresos por Nivel Educativo",
+       x = "Nivel Educativo",
+       y = "Promedio ($)")
+
+diag_barra
+```
+
+Los ingresos promedio si varian segun el nivel educativo, puesto que cada uno de ellos tienen un promedio diferente. Tambien se evidencia que los ingresos no tienen una relacion proporcional al nivel de educacion, lo que puede ser consecuancia de diversos factores externos
+
+## 10. Compara las HorasDeTrabajo promedio entre personas con diferentes niveles educativos. ¿Qué observas?
+
+```{r}
+# Accedemos a la cantidad de horas de trabajo por nivel educativo gracias a la
+# variable "nivel_educactivo" anteriormente creada. Se crea un dataframe para
+# poder realizar un grafico adecuadamente con ggplot
+df_promedio_horas_trabajo <- data.frame(Nivel = c("Primaria", "Secundaria", "Técnico", "Universitario"),
+                                   Promedio = c(
+                                     mean(nivel_educactivo$Primaria$HorasDeTrabajo),
+                                     mean(nivel_educactivo$Secundaria$HorasDeTrabajo),
+                                     mean(nivel_educactivo$Técnico$HorasDeTrabajo),
+                                     mean(nivel_educactivo$Universitario$HorasDeTrabajo)))
+
+diag_barra <- ggplot(df_promedio_horas_trabajo, aes(x = Nivel, y = Promedio)) +
+  geom_bar(stat = "identity", fill = 4) +
+  geom_text(aes(label = round(Promedio, 2)), vjust = -1, colour = "black") +
+  ylim(c(0, 55)) +
+  labs(title = "Promedio de Horas de Trabajo por Nivel Educativo",
+       x = "Nivel Educativo",
+       y = "Promedio (h)")
+
+diag_barra
+```
+
+Se observa que las personas con un nivel tecnico trabajan, en promedio, una mayor cantidad de horas. En contraste con el analisis numero 9 (ingresos promedio segun nivel educativo) se muestra que, aunque las personas con nivel educativo de primaria tienen mayores ingresos, trabajan menos horas.
