@@ -80,7 +80,7 @@ nrow(muestra_datos)
 ```
 
 
-# Diagrama de Caja y Bigotes representanto el ingreso Mensual por Nivel Educativo
+# 11. Diagrama de Caja y Bigotes representanto el ingreso Mensual por Nivel Educativo
 ```{r}
 boxplot_ingreso <- ggplot(muestra_datos, aes(x = NivelEducativo, y = IngresoMensual)) +
   geom_boxplot(fill = "lightblue", color = "darkblue") +
@@ -96,7 +96,7 @@ Este gráfico muestra cómo varía el ingreso mensual según el nivel educativo 
 - Se observan valores atípicos (, especialmente en el nivel Primaria, lo cual indica que algunas personas con este nivel educativo tienen ingresos significativamente mayores que el promedio.
 - Esto puede ser un reflejo de factores como experiencia laboral u otros aspectos que influyen en el ingreso.
 
-# Gráfico de dispersión con la relación entre Edad y Horas de Trabajo
+# 12. Gráfico de dispersión con la relación entre Edad y Horas de Trabajo
 ```{r}
 scatter_plot <- ggplot(muestra_datos, aes(x = Edad, y = HorasDeTrabajo)) +
   geom_point(color = "blue") +
@@ -108,13 +108,13 @@ scatter_plot
 
 
 
-# Observaciones principales del gráfico de dispersión
+## Observaciones principales del gráfico de dispersión
 
 ![Grafica1 con observacion](Grafico1.png)
 
 Como podemos ver en la imagen, la mayoría de puntos del gráfico de dispersión se encuentran entre 50 y 30    , lo que indica que la mayoría de trabajadores trabajan alrededor de 40 horas independientemente de su edad.
 
-# Tabla de doble entrada representando la distribución conjunta de Género y Nivel Educativo
+# 13. Tabla de doble entrada representando la distribución conjunta de Género y Nivel Educativo
 ```{r}
 tabla_conjunta <- table(muestra_datos$Genero, muestra_datos$NivelEducativo)
 tabla_conjunta
@@ -125,7 +125,7 @@ La tabla muestra la distribución de personas según su género y nivel educativ
 - Los géneros "Masculino" y "Otro" presentan menores frecuencias en niveles como Universitario o Primaria.
 - Esto puede ser útil para observar tendencias de acceso educativo según género y tomar decisiones basadas en datos.
 
-# Proporción de personas con más de 2 hermanos e ingreso mensual > $3000
+# 14. Proporción de personas con más de 2 hermanos e ingreso mensual > $3000
 ```{r}
 filtro <- filter(muestra_datos, IngresoMensual > 3000)
 proporcion <- nrow(filtro) / nrow(muestra_datos %>% filter(Hermanos > 2))
@@ -140,10 +140,10 @@ En esta parte, se analiza qué proporción de personas con más de dos hermanos 
 La proporción calculada indica que aproximadamente el 16.95% de las personas en la muestra tienen más de 2 hermanos y dentro de este grupo, tienen un ingreso mensual mayor a $3000.
 
 
-# Análisis de resultados
+# 15. Análisis de resultados
 El Nivel Educativo parece tener una relación significativa con el ingreso mensual, ya que las personas con niveles educativos más altos suelen acceder a mejores empleos.
 
-
+# 16. Variables que eligiria para predecir las horas de trabajo
 Si quisiera predecir las Horas de Trabajo, elegiría Edad, Nivel Educativo e Ingreso Mensual.
 Esto se debe a que estas variables pueden estar relacionadas con la cantidad de horas que una persona trabaja, según su etapa de vida, formación y tipo de empleo.
 
