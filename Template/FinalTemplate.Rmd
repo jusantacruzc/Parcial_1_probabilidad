@@ -1,89 +1,133 @@
 ---
-title: "Parcial descriptiva"
-author: "Recordar poner nombres"
-date: "`r Sys.Date()`"
+title: "Parcial Estadística Descriptiva"
+author: "Andres Javier Castillo Deaza -+-
+Juan Esteban Santacruz Corredor -+-
+Nicolás Quezada Mora -+-
+Omar Chaparro Flechas"
+date: "2024-12-08"
 output: 
   rmdformats::readthedown:
     highlight: tango
     self_contained: true
     thumbnails: true
+    output: html_document
 ---
 
 <style>
 
-/* Cambiar el fondo de la barra lateral */
+#main :not(.leaflet-control) > a {
+  background-image: linear-gradient(180deg, #0099DB, #00A2E8);
+  color: #000000;
+}
 
-#postamble{
+#nav-top span.glyphicon {
+    color: #191970;
+}
+
+#postamble {
  border-top:none;
 }
 
 #toc, #sidebar {
-  background-color: #000000; /* Color de fondo */
+  background-color: #000000;
 }
 
 #toc a:hover {
-  background-color: #6495ED; /* Color del texto */
+  background-color: #6495ED;
   color: white;
 }
 
 #sidebar h2 {
-  background-color: #191970;    /* Color de la barra lateral */
+  background-color: #191970;
 }
 
 #toc a {
-  color: #FFFFF0; /* Color del texto */
+  color: #FFFFF0;
 }
-
-
 
 h1, h2, h3 {
-  color: #0000FF; /* Color de los encabezados */
+  color: #0000FF;
 }
 
-img.image-thumb  {
-    width: 100%; 
+img.image-thumb {
+    width: 100%;
     max-width: 10000px;
 }
+
 </style>
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE)
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# libreria para la interfaz:
+# install.packages("rmdformats")
+
+# libreria para la visualizacion de tablas:
+# install.packages("DT")
+library(DT)
 ```
+
+# Introducción
+
+En el ámbito de las ciencias sociales y la investigación de mercados, la recopilación y el análisis de datos juegan un papel fundamental en la toma de decisiones informadas. Este trabajo se enfoca en el análisis estadístico de un conjunto de datos con el objetivo de explorar diversas variables relacionadas con características demográficas y socioeconómicas, como el nivel educativo, el género, la edad, los ingresos mensuales, la cantidad de hermanos, y las horas de trabajo.
+
+A lo largo de este análisis, se utilizarán métodos tanto descriptivos como inferenciales para proporcionar una visión clara sobre cómo se distribuyen y se relacionan las diferentes variables. Se abordarán desde las variables cualitativas (género y nivel educativo), hasta las cuantitativas (edad, ingreso mensual y horas de trabajo). Asimismo, se realizarán comparaciones y análisis gráficos para identificar posibles tendencias o patrones en los datos, lo que permitirá obtener conclusiones valiosas sobre los comportamientos y características de la muestra estudiada.
+
+Este estudio emplea herramientas estadísticas básicas para presentar los resultados de forma clara y visual mediante gráficos, tablas y medidas fundamentales como la media, mediana, rango y desviación estándar.
+
+# Marco Teórico
+
+El análisis de datos es un proceso clave en la estadística y la investigación empírica. Se puede clasificar en diferentes tipos de variables que requieren técnicas específicas para su análisis:
+
+**1. Variables cualitativas:** Son aquellas que no tienen un valor numérico, sino que describen categorías o cualidades. Pueden ser nominales (como el género) u ordinales (si existe un orden entre las categorías, como los niveles educativos). Para su análisis, se utilizan herramientas como las tablas de frecuencia y los gráficos de barras o de pastel.
+
+**2. Variables cuantitativas:** Estas variables tienen valores numéricos y pueden ser discretas o continuas. Las variables discretas son aquellas que toman valores enteros o finitos, como el número de hermanos, mientras que las variables continuas pueden tomar un rango infinito de valores, como la estatura o los ingresos mensuales. El análisis de estas variables implica el uso de medidas de tendencia central (media, mediana) y dispersión (desviación estándar, varianza), además de gráficos como histogramas o diagramas de caja.
+
+**3. Análisis univariado y bivariado:** En el análisis univariado, se examinan de manera individual las características de una sola variable. En el análisis bivariado, se exploran las relaciones entre dos variables para identificar correlaciones, tendencias o diferencias. Herramientas como los gráficos de dispersión y los diagramas de caja permiten visualizar estas relaciones de manera clara.
+
+**4. Análisis de la distribución de variables:** Para las variables cuantitativas continuas, se busca comprender su distribución mediante el cálculo de medidas como el rango, que indica la diferencia entre el valor más alto y el más bajo, y el coeficiente de variación, que ayuda a comparar la variabilidad entre distintas distribuciones. Los percentiles y la varianza también son utilizados para describir la dispersión de los datos.
+
+**5. Análisis de relaciones:** Una parte importante del análisis estadístico es identificar cómo las variables se relacionan entre sí. Se pueden realizar comparaciones de medias entre grupos para observar diferencias entre categorías (por ejemplo, comparar los ingresos según el nivel educativo). Estas comparaciones pueden realizarse mediante pruebas estadísticas y gráficos adecuados.
+
+**6. Predicción y modelos estadísticos:** A través de la identificación de relaciones entre variables, es posible realizar predicciones. Por ejemplo, al analizar la relación entre las horas de trabajo y otras variables, como el nivel educativo o la edad, se puede intentar predecir el comportamiento de una variable en función de las demás.
 
 # Configuraciones iniciales
 
 ## I. Cargar librerías necesarias
 
-```{r libraries, message='false'}
+```{r libraries, message = 'false'}
+# install.packages("ggplot2")
+# install.packages("dplyr")
 library(ggplot2)  
 library(dplyr)
 ```
  
 ## II. Cargar la base de datos
 
-Se carga la base de datos provista para el ejercicio y se pone en una tabla para poder ser usada
+Se carga la base de datos provista para el ejercicio en un data frame para poder ser usada
+
 ```{r ruta}
 ruta <- "Base_Estadistica_Descriptiva.csv"
-muestra_datos <- read.csv(ruta, header = TRUE, sep = ",")
+datos <- read.csv(ruta, header = TRUE, sep = ",")
 ```
 
 ## III. Configuración de la semilla y selección de datos
 
-Se usa la semilla con los ultimos dos digitos de cada uno de los documentos de los integrantes
-despues de esto se toma una muestra de 100 datos
+Se usa la semilla con los ultimos dos digitos de cada uno de los documentos de los integrantes. Despues de esto se toma una muestra de 100 datos
+
 ```{r}
 set.seed(89025074)
-muestra_datos <- muestra_datos[sample(nrow(muestra_datos), size = 100), 1:8]
+muestra_datos <- datos[sample(nrow(datos), size = 100), 1:8]
 ```
 
-
-## IV. Número de filas en la muestra
+## IV. Muestra obtenida
 
 Esto se hace para verificar que se hayan seleccionado correctamente 100 datos de nuestra base de datos
+
 ```{r}
-nrow(muestra_datos)
+datatable(muestra_datos)
 ```
+
 # 1. Análisis de Variables Cualitativas
 
 ## 1. Construir tablas de frecuencia y grafico de barras
@@ -102,30 +146,29 @@ barplot(frecuencias_nivel_educativo,
 ```
 
 
-## 2. Porcentaje de generos y grafico pastel 
+## 2. Porcentaje de generos y grafico pastel
+
 ```{r}
 frecuencia_genero <- table(muestra_datos$Genero)
 
-pie(
-  frecuencia_genero, 
-  labels = paste0(names(frecuencia_genero), "\n", round(100 * frecuencia_genero / sum(frecuencia_genero), 10), "%"), 
-  main = "Gráfico de Pastel (Base R)", 
-  col = rainbow(length(frecuencia_genero)),
-  radius = 0.8
-)
+pie(frecuencia_genero,
+    labels = paste0(names(frecuencia_genero), " ", round(100 * frecuencia_genero / sum(frecuencia_genero), 10), "%"),
+    main = "Gráfico de Pastel", 
+    col = c("#2C517B", "#286EA1", "#6B96B9"),
+    radius = 0.9)
 
 ```
 
 # 2. Análisis de Variables Cuantitativas Discretas
+
 ## 3. Media, mediana y desviación estándar de la variable Edad.
+
 ```{r}
 edad <- muestra_datos$Edad
 media_edad <- mean(edad)
 mediana_edad <- median(edad)
 desviacion_edad <- sd(edad)
-
 ```
-
 
 ## 4. Personas con mas de tres hermanos
 
@@ -139,11 +182,12 @@ barplot(tabla_hermanos,
         main = "Distribución por número de hermanos",
         xlab = "Grupo",
         ylab = "Cantidad de personas",
-        col = c("skyblue", "blue"),
+        col = c("dodgerblue4", "dodgerblue3"),
         border = "black")
 ```
 
 ## 5.Rango, varianza y coeficiente de variación de la variable IngresoMensual.
+
 ```{r}
 rango <- range(muestra_datos$IngresoMensual)
 rango_num <- diff(rango)
@@ -162,8 +206,6 @@ list(
 )
 
 ```
-
-
 
 # 3. Análisis de Variables Cuantitativas Continuas
 
@@ -290,7 +332,9 @@ diag_barra
 Se observa que las personas con un nivel tecnico trabajan, en promedio, una mayor cantidad de horas. En contraste con el analisis numero 9 (ingresos promedio segun nivel educativo) se muestra que, aunque las personas con nivel educativo de primaria tienen mayores ingresos, trabajan menos horas.
 
 # 5. Análisis Gráfico
+
 ## 11. Diagrama de Caja y Bigotes representanto el ingreso Mensual por Nivel Educativo
+
 ```{r}
 boxplot_ingreso <- ggplot(muestra_datos, aes(x = NivelEducativo, y = IngresoMensual)) +
   geom_boxplot(fill = "lightblue", color = "darkblue") +
@@ -299,14 +343,15 @@ boxplot_ingreso <- ggplot(muestra_datos, aes(x = NivelEducativo, y = IngresoMens
   theme_minimal()
 boxplot_ingreso
 ```
-Este gráfico muestra cómo varía el ingreso mensual según el nivel educativo (Primaria, Secundaria, Técnico y Universitario). Cada caja representa la mediana, el rango intercuartil (25% - 75%) y los valores extremos (bigotes).
 
+Este gráfico muestra cómo varía el ingreso mensual según el nivel educativo (Primaria, Secundaria, Técnico y Universitario). Cada caja representa la mediana, el rango intercuartil (25% - 75%) y los valores extremos (bigotes).
 
 - En general, los ingresos tienden a ser más altos para niveles educativos como Técnico y Universitario en comparación con Primaria y Secundaria.
 - Se observan valores atípicos (, especialmente en el nivel Primaria, lo cual indica que algunas personas con este nivel educativo tienen ingresos significativamente mayores que el promedio.
 - Esto puede ser un reflejo de factores como experiencia laboral u otros aspectos que influyen en el ingreso.
 
 ## 12. Gráfico de dispersión con la relación entre Edad y Horas de Trabajo
+
 ```{r}
 scatter_plot <- ggplot(muestra_datos, aes(x = Edad, y = HorasDeTrabajo)) +
   geom_point(color = "blue") +
@@ -315,8 +360,6 @@ scatter_plot <- ggplot(muestra_datos, aes(x = Edad, y = HorasDeTrabajo)) +
   theme_minimal()
 scatter_plot
 ```
-
-
 
 ## Observaciones principales del gráfico de dispersión
 
@@ -327,10 +370,12 @@ Como podemos ver en la imagen, la mayoría de puntos del gráfico de dispersión
 # 6. Análisis Conjunto
 
 ## 13. Tabla de doble entrada representando la distribución conjunta de Género y Nivel Educativo
+
 ```{r}
 tabla_conjunta <- table(muestra_datos$Genero, muestra_datos$NivelEducativo)
 tabla_conjunta
 ```
+
 La tabla muestra la distribución de personas según su género y nivel educativo. Cada celda representa la cantidad de personas de un género específico que alcanzaron un nivel educativo determinado.
 
 - El nivel Secundaria parece ser el más común en el género femenino (12 personas).
@@ -338,6 +383,7 @@ La tabla muestra la distribución de personas según su género y nivel educativ
 - Esto puede ser útil para observar tendencias de acceso educativo según género y tomar decisiones basadas en datos.
 
 ## 14. Proporción de personas con más de 2 hermanos e ingreso mensual > $3000
+
 ```{r}
 filtro <- filter(muestra_datos, IngresoMensual > 3000)
 proporcion <- nrow(filtro) / nrow(muestra_datos %>% filter(Hermanos > 2))
@@ -357,8 +403,13 @@ La proporción calculada indica que aproximadamente el 16.95% de las personas en
 El Nivel Educativo parece tener una relación significativa con el ingreso mensual, ya que las personas con niveles educativos más altos suelen acceder a mejores empleos.
 
 ## 16. Variables que eligiria para predecir las horas de trabajo
+
 Si quisiera predecir las Horas de Trabajo, elegiría Edad, Nivel Educativo e Ingreso Mensual.
 Esto se debe a que estas variables pueden estar relacionadas con la cantidad de horas que una persona trabaja, según su etapa de vida, formación y tipo de empleo.
 
+# Bibliografía
 
-
+- Estadística Descriptiva y Probabilidad (Teoría y problemas) (3.a ed.). (2006). Universidad de Cádiz.
+- Bluman, A. G. (2014). Estadística: Un Enfoque Aplicado (9ª ed.). McGraw-Hill.
+- Devore, J., Probabilidad y Estadística para ingenieros y científicos, Cengage learning editores – México, 2006
+- Siqueira, D. (2023, 29 marzo). Histograma: qué es, ejemplos, gráficos y tipos. Alura. <https://www.aluracursos.com/blog/histograma-que-es-ejemplos-graficos-y-tipos>
