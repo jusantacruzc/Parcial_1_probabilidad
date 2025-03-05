@@ -3,7 +3,7 @@ title: "Proyecto final"
 author: "Omar Chaparro Flechas -+-
 Andres Javier Castillo Deaza -+-
 Juan Esteban Santacruz Corredor -+-
-Nicolás Quezada Mora -+-
+Nicolás Quezada Mora
 "
 date: "2025-03-05"
 output: 
@@ -68,25 +68,59 @@ knitr::opts_chunk$set(echo = TRUE, include = TRUE)
 library(DT)
 ```
 
-# Marco Teórico
+<div style="text-align: center; padding: 50px 0;">
+  <h1 style="font-size: 45px; font-weight: bold;">Relación entre Estado Civil y Nivel de Gastos: Un Análisis Basado en Género e Ingresos</h1>
+  <h2 style="font-size: 30px; font-weight: bold;">Universidad Nacional de Colombia</h2>
+  <h3 style="font-size: 20px; font-weight: bold;">Probabilidad y estadística fundamental</h3>
+  <h4 style="font-size: 22px;">Autores:</h4>
+  <p style="font-size: 20px;">Omar Chaparro - Javier Castillo - Esteban Santacruz - Nicolás Quezada</p>
+</div>
+
+---
+
+<h2> Contenido </h2>
+
+1.  
+
+---
+
+<h2> Objetivo General </h2>
 
 
+
+<h3> Objetivos Específicos </h3>
+
+- 
+
+---
+
+<h2> Pregunta de Investigación </h2>
+
+¿Qué estado civil presenta un mayor nivel de gastos en comparación con los demás?
+
+---
+
+<h2> Marco Teórico </h2>
+
+
+
+---
 
 # Configuraciones iniciales
 
 ## I. Cargar librerías necesarias
 
-```{r libraries, message = 'false'}
+```{r libraries, message = FALSE, warning = FALSE}
 # install.packages("ggplot2")
 # install.packages("dplyr")
 # install.packages("readxl")
 # install.packages("moments")
-library(ggplot2)  
+library(ggplot2)
 library(dplyr)
 library(readxl)
 library(moments) 
 ```
- 
+
 ## II. Cargar de registros
 
 Se carga el archivo con los registros
@@ -112,6 +146,98 @@ Esto se hace para verificar que se hayan seleccionado correctamente 995 registro
 datatable(muestra)
 ```
 
+# Variables Cualitativas
+
+```{r}
+frecuencia_estado_civil <- table(muestra$estado_civil)
+
+pie(frecuencia_estado_civil,
+    labels = paste0(names(frecuencia_estado_civil), " ", 
+                    round(100 * frecuencia_estado_civil / sum(frecuencia_estado_civil), 2), "%"),
+    main = "Proporcion del Estado Civil en la Muestra", 
+    col = c("#2C517B", "#286EA1", "#6B96B9", "#A8C0D5"),
+    radius = 1)
+```
+
+Si hay un estado civil predominante en la muestra, puede influir en el análisis de gastos, ya que ciertos estados civiles conllevan mayores responsabilidades económicas. En este caso, observamos que la mayoría de las personas en la muestra se encuentran divorciadas (36.98%), lo que puede resultar en mayores costos individuales en comparación con quienes están casados, ya que no comparten gastos. Además, es probable que enfrenten obligaciones financieras adicionales.
+
+El grupo de solteros (28.94%) también es relevante, ya que, dependiendo de su nivel de ingresos, pueden tener mayor libertad financiera. A continuación, examinaremos los ingresos.
+
+```{r}
+ingresos_ordenados <- sort(muestra$ingresos)
+frecuencia_acumulada <- cumsum(table(muestra$ingresos))
+
+frecuencia_acumulada_porcentaje <- frecuencia_acumulada / max(frecuencia_acumulada) * 100
+
+plot(names(frecuencia_acumulada), frecuencia_acumulada_porcentaje, type = "s", 
+     main = "Distribucion Acumulada de Ingresos",
+     xlab = "Ingresos (COP)",
+     ylab = "Porcentaje Acumulado",
+     col = "blue", lwd = 2)
+grid()
+```
+
+La curva empieza de manera plana lo que indica que hay pocas personas con ingresos en los niveles más bajos de la muestra. Sin embargo, su pendiente aumenta rapidamente entre los ingresos de 1800000 y 2200000 aproximadamente, lo que sugiere que la mayoría de las personas en la muestra tienen ingresos en este rango. El 90% de la muestra parece ganar menos de 2300000, lo que nos dice que los ingresos más altos están concentrados en un pequeño grupo de personas.
+
+# Variables Cuantitativas
+
+Ahora calcularemos la media, mediana y desviación estándar de los ingresos para analizar la distribución de los ingresos en la muestra y determinar si hay una dispersión significativa en los datos.
+
+```{r}
+media_ingresos <- mean(muestra$ingresos)
+mediana_ingresos <- median(muestra$ingresos)
+desviacion_ingresos <- sd(muestra$ingresos)
+```
+
+```{r, echo=FALSE}
+cat("Media de ingresos:", media_ingresos, "\n")
+cat("Mediana de ingresos:", mediana_ingresos, "\n")
+cat("Desviación estándar de ingresos:", desviacion_ingresos, "\n")
+```
+
+Observamos que la media de ingresos es 1991152, mientras que la mediana es 1987601. La proximidad de estos valores indica que la distribución de los ingresos es relativamente simétrica, sin una gran concentración de valores extremos que alteren la media. Además, la desviación estándar es 187575.3, lo que significa que la mayoría de los ingresos en la muestra se encuentran dentro de un rango de $\pm$ 188000 unidades respecto a la media, mostrando una variabilidad moderada.
+
+Ahora, con el percentil 90, identificaremos el umbral superior en el cual se encuentra el 90% de las personas, lo que nos permitirá ver si hay un grupo reducido con ingresos muy elevados.
+
+```{r}
+percentil_90_ingresos <- quantile(muestra$ingresos, 0.90)
+```
+
+```{r, echo=FALSE}
+cat("Percentil 90 de ingresos:", percentil_90_ingresos, "\n")
+```
+
+Vemos que el percentil 90 es 2235825, lo que indica que solo el 10% de las personas en la muestra tiene ingresos superiores a este valor. Esto sugiere que existe un pequeño grupo de personas con ingresos más altos, aunque la diferencia con la media no es extremadamente grande.
+
+Por último, analizaremos la relación entre ingresos y gastos mediante la correlación, lo que nos permitirá ver si las personas con mayores ingresos tienden a gastar más.
+
+```{r}
+correlacion_ingresos_gastos <- cor(muestra$ingresos, muestra$gastos)
+```
+
+```{r, echo=FALSE}
+cat("Correlación entre ingresos y gastos:", correlacion_ingresos_gastos, "\n")
+```
+
+Vemos que la correlación obtenida es 0.069, lo que indica una relación muy débil entre ingresos y gastos. Esto sugiere que las personas no necesariamente gastan más cuando tienen mayores ingresos. Es posible que otros factores, como el estado civil, tengan una mayor influencia en los niveles de gasto, lo que nos lleva a explorar la relación entre el estado civil y los gastos en el siguiente análisis.
+
+```{r}
+scatter_plot <- ggplot(muestra, aes(x = estado_civil, y = gastos)) +
+  geom_jitter(aes(color = estado_civil), width = 0.3, alpha = 0.6) +
+  labs(title = "Relacion entre Estado Civil y Gastos",
+       x = "Estado Civil",
+       y = "Gastos") +
+  theme_minimal() +
+  scale_color_manual(values = c("#286EA1", "#286EA1", "#286EA1", "#286EA1")) +
+  theme(legend.position = "none")
+
+scatter_plot
+```
+
+Los puntos están relativamente dispersos en todas las categorías, lo que indica que los gastos varían ampliamente dentro de cada estado civil. Se pueden observar algunos puntos aislados tanto en la parte baja como en la parte alta, lo que sugiere la presencia de valores atípicos. Estos valores podrían representar personas con hábitos de gasto inusuales.
+
+En general, no se observa una diferencia evidente entre el estado civil, por lo que no se puede concluir de manera directa que el estado civil afecta significativamente a la cantidad de gastos.
+
 # Bibliografía
 
-- 
+- Walpole, R. E. (2012). PROBABILIDAD y ESTADISTICA PARA INGENIEROS y CIENCIAS, 9ED.
