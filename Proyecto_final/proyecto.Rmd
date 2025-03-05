@@ -1,0 +1,117 @@
+---
+title: "Proyecto final"
+author: "Omar Chaparro Flechas -+-
+Andres Javier Castillo Deaza -+-
+Juan Esteban Santacruz Corredor -+-
+Nicolás Quezada Mora -+-
+"
+date: "2025-03-05"
+output: 
+  rmdformats::readthedown:
+    highlight: tango
+    self_contained: true
+    thumbnails: true
+    output: html_document
+---
+
+<style>
+
+#main :not(.leaflet-control) > a {
+  background-image: linear-gradient(180deg, #0099DB, #00A2E8);
+  color: #000000;
+}
+
+#nav-top span.glyphicon {
+    color: #191970;
+}
+
+#postamble {
+ border-top:none;
+}
+
+#toc, #sidebar {
+  background-color: #000000;
+}
+
+#toc a:hover {
+  background-color: #6495ED;
+  color: white;
+}
+
+#sidebar h2 {
+  background-color: #191970;
+}
+
+#toc a {
+  color: #FFFFF0;
+}
+
+h1, h2, h3 {
+  color: #0000FF;
+}
+
+img.image-thumb {
+    width: 100%;
+    max-width: 10000px;
+}
+
+</style>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, include = TRUE)
+
+# libreria para la interfaz:
+# install.packages("rmdformats")
+
+# libreria para la visualizacion de tablas:
+# install.packages("DT")
+library(DT)
+```
+
+# Marco Teórico
+
+
+
+# Configuraciones iniciales
+
+## I. Cargar librerías necesarias
+
+```{r libraries, message = 'false'}
+# install.packages("ggplot2")
+# install.packages("dplyr")
+# install.packages("readxl")
+# install.packages("moments")
+library(ggplot2)  
+library(dplyr)
+library(readxl)
+library(moments) 
+```
+ 
+## II. Cargar de registros
+
+Se carga el archivo con los registros
+
+```{r datos}
+datos <- read_excel("encuesta.xlsx")
+```
+
+## III. Configuración de la semilla y selección de datos
+
+Se usa la semilla con los ultimos dos digitos de cada uno de los documentos de los integrantes. Despues de esto se toma una muestra de 995 registros
+
+```{r semilla}
+set.seed(89025074)
+muestra <- sample_n(datos, 995)
+```
+
+## IV. Muestra obtenida
+
+Esto se hace para verificar que se hayan seleccionado correctamente 995 registros
+
+```{r tabla}
+datatable(muestra)
+```
+
+# Bibliografía
+
+- 
